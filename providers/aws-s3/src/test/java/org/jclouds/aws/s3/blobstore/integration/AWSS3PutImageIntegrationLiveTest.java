@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.Set;
 
 import org.jclouds.Constants;
 import org.jclouds.blobstore.BlobStore;
@@ -35,7 +36,9 @@ import org.jclouds.blobstore.BlobStoreContextFactory;
 import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.io.Payloads;
 import org.jclouds.io.payloads.FilePayload;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -59,7 +62,7 @@ public class AWSS3PutImageIntegrationLiveTest {
     private BlobStore s3BlobStore = null;
     private BlobStoreContext s3BlobStoreContext = null;
 
-    @BeforeMethod
+    @BeforeClass
     public void beforeMethod() throws Exception {
         Properties overrides = new Properties();
         overrides.setProperty(Constants.PROPERTY_MAX_CONNECTIONS_PER_CONTEXT,
@@ -69,27 +72,31 @@ public class AWSS3PutImageIntegrationLiveTest {
         overrides.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, 5000 + "");
         overrides.setProperty(Constants.PROPERTY_SO_TIMEOUT, 5000 + "");
         overrides.setProperty(Constants.PROPERTY_IO_WORKER_THREADS, 20 + "");
+        // overrides.setProperty(Constants.PROPERTY_REQUEST_TIMEOUT, 500 + "");
         // unlimited user threads
         overrides.setProperty(Constants.PROPERTY_USER_THREADS, 0 + "");
 
         String identity = System.getProperty("test.aws-s3.identity");
         String credential = System.getProperty("test.aws-s3.credential");
 
+        Set<Module> wiring = Collections.<Module> emptySet();
+        // Set<? extends Module> wiring = ImmutableSet.of( new ApacheHCHttpCommandExecutorServiceModule() );
+
         BlobStoreContextFactory bsFactory = new BlobStoreContextFactory();
         s3BlobStoreContext = bsFactory.createContext("aws-s3",
                 identity,
-                credential, Collections.<Module> emptySet(), overrides);
+                credential, wiring, overrides);
 
         s3BlobStore = s3BlobStoreContext.getBlobStore();
         assertNotNull(s3BlobStore);
     }
     
-    @AfterMethod
+    @AfterClass
     public void afterMethod() {
         s3BlobStoreContext.close();
     }
 
-    @Test(groups = { "integration", "live" }, invocationCount = 1, threadPoolSize = 1 )
+    @Test(groups = { "integration", "live" }, invocationCount = 100, threadPoolSize = 20 )
     public void testPutImage() throws InterruptedException, IOException {
         
         File testImg = new File( getClass().getResource( "/testimg.png" ).getFile() );
@@ -103,7 +110,10 @@ public class AWSS3PutImageIntegrationLiveTest {
         final FilePayload payload = Payloads.newFilePayload( testImg );
         payload.getContentMetadata().setContentType( "image/png" );
         blob.setPayload( payload );
+        long start = System.currentTimeMillis();
+        System.out.println( "Starting to put " + blobName );
         s3BlobStore.putBlob( S3_BUCKET, blob );
+        System.out.println( "Finished to put " + blobName + ", this took " + ( System.currentTimeMillis() - start ) + " msec.");
         
         assertTrue( s3BlobStore.blobExists( S3_BUCKET, blobName ) );
 
