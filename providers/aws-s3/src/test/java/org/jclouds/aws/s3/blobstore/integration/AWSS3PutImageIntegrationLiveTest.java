@@ -37,9 +37,7 @@ import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.io.Payloads;
 import org.jclouds.io.payloads.FilePayload;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.inject.Module;
@@ -75,6 +73,7 @@ public class AWSS3PutImageIntegrationLiveTest {
         // overrides.setProperty(Constants.PROPERTY_REQUEST_TIMEOUT, 500 + "");
         // unlimited user threads
         overrides.setProperty(Constants.PROPERTY_USER_THREADS, 0 + "");
+        overrides.setProperty("aws-s3.endpoint", "https://s3-eu-west-1.amazonaws.com");
 
         String identity = System.getProperty("test.aws-s3.identity");
         String credential = System.getProperty("test.aws-s3.credential");
