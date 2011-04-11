@@ -40,6 +40,7 @@
         <test.aws-s3.apiversion>2006-03-01</test.aws-s3.apiversion>
         <test.aws-s3.identity>${test.aws.identity}</test.aws-s3.identity>
         <test.aws-s3.credential>${test.aws.credential}</test.aws-s3.credential>
+        <test.blobstore.container-count>25</test.blobstore.container-count>
     </properties>
 
     <!-- temporary -->
@@ -87,38 +88,20 @@
         </dependency>
         <dependency>
             <groupId>org.jclouds.driver</groupId>
-            <artifactId>jclouds-apachehc</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jclouds.driver</groupId>
             <artifactId>jclouds-log4j</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.jclouds.driver</groupId>
-            <artifactId>jclouds-netty</artifactId>
+            <artifactId>jclouds-apachehc</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.netty</groupId>
-            <artifactId>netty</artifactId>
-            <version>3.2.4.Final</version>
+            <groupId>org.jclouds.driver</groupId>
+            <artifactId>jclouds-enterprise</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -167,6 +150,10 @@
                                         <property>
                                             <name>jclouds.blobstore.httpstream.md5</name>
                                             <value>${jclouds.blobstore.httpstream.md5}</value>
+                                        </property>
+                                        <property>
+                                            <name>test.blobstore.container-count</name>
+                                            <value>${test.blobstore.container-count}</value>
                                         </property>
                                     </systemProperties>
                                 </configuration>

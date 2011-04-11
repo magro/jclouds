@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.enterprise.config;
 
 import java.util.concurrent.ExecutorService;
@@ -25,6 +24,7 @@ import org.jclouds.concurrent.config.ConfiguresExecutorService;
 import org.jclouds.concurrent.config.ExecutorServiceModule;
 import org.jclouds.date.joda.config.JodaDateServiceModule;
 import org.jclouds.encryption.bouncycastle.config.BouncyCastleCryptoModule;
+import org.jclouds.netty.config.NettyPayloadModule;
 
 /**
  * Configures Enterprise-grade components
@@ -47,6 +47,7 @@ public class EnterpriseConfigurationModule extends ExecutorServiceModule {
    protected void configure() {
       install(new BouncyCastleCryptoModule());
       install(new JodaDateServiceModule());
+      install(new NettyPayloadModule());
    }
 
 }

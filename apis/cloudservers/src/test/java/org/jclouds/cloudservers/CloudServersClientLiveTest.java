@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.cloudservers;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,6 +40,7 @@ import org.jclouds.cloudservers.domain.DailyBackup;
 import org.jclouds.cloudservers.domain.Flavor;
 import org.jclouds.cloudservers.domain.Image;
 import org.jclouds.cloudservers.domain.ImageStatus;
+import org.jclouds.cloudservers.domain.Limits;
 import org.jclouds.cloudservers.domain.RebootType;
 import org.jclouds.cloudservers.domain.Server;
 import org.jclouds.cloudservers.domain.ServerStatus;
@@ -92,7 +92,7 @@ public class CloudServersClientLiveTest {
    protected void setupCredentials() {
       identity = checkNotNull(System.getProperty("test." + provider + ".identity"), "test." + provider + ".identity");
       credential = checkNotNull(System.getProperty("test." + provider + ".credential"), "test." + provider
-               + ".credential");
+            + ".credential");
       endpoint = System.getProperty("test." + provider + ".endpoint");
       apiversion = System.getProperty("test." + provider + ".apiversion");
    }
@@ -116,14 +116,20 @@ public class CloudServersClientLiveTest {
       Properties overrides = setupProperties();
 
       Injector injector = new RestContextFactory().createContextBuilder(provider,
-               ImmutableSet.<Module> of(new Log4JLoggingModule(), new JschSshClientModule()), overrides)
-               .buildInjector();
+            ImmutableSet.<Module> of(new Log4JLoggingModule(), new JschSshClientModule()), overrides).buildInjector();
 
       client = injector.getInstance(CloudServersClient.class);
       sshFactory = injector.getInstance(SshClient.Factory.class);
       SocketOpen socketOpen = injector.getInstance(SocketOpen.class);
       socketTester = new RetryablePredicate<IPSocket>(socketOpen, 120, 1, TimeUnit.SECONDS);
       injector.injectMembers(socketOpen); // add logger
+   }
+
+   public void testLimits() throws Exception {
+      Limits response = client.getLimits();
+      assert null != response;
+      assertTrue(response.getAbsolute().size() > 0);
+      assertTrue(response.getRate().size() > 0);
    }
 
    public void testListServers() throws Exception {
@@ -323,8 +329,8 @@ public class CloudServersClientLiveTest {
       while (server == null) {
          String serverName = serverPrefix + "createserver" + new SecureRandom().nextInt();
          try {
-            server = client.createServer(serverName, imageId, flavorId, withFile("/etc/jclouds.txt",
-                     "rackspace".getBytes()).withMetadata(metadata));
+            server = client.createServer(serverName, imageId, flavorId,
+                  withFile("/etc/jclouds.txt", "rackspace".getBytes()).withMetadata(metadata));
          } catch (UndeclaredThrowableException e) {
             HttpResponseException htpe = (HttpResponseException) e.getCause().getCause();
             if (htpe.getResponse().getStatusCode() == 400)
@@ -343,7 +349,7 @@ public class CloudServersClientLiveTest {
    private void blockUntilServerActive(int serverId) throws InterruptedException {
       Server currentDetails = null;
       for (currentDetails = client.getServer(serverId); currentDetails.getStatus() != ServerStatus.ACTIVE; currentDetails = client
-               .getServer(serverId)) {
+            .getServer(serverId)) {
          System.out.printf("blocking on status active%n%s%n", currentDetails);
          Thread.sleep(5 * 1000);
       }
@@ -352,7 +358,7 @@ public class CloudServersClientLiveTest {
    private void blockUntilServerVerifyResize(int serverId) throws InterruptedException {
       Server currentDetails = null;
       for (currentDetails = client.getServer(serverId); currentDetails.getStatus() != ServerStatus.VERIFY_RESIZE; currentDetails = client
-               .getServer(serverId)) {
+            .getServer(serverId)) {
          System.out.printf("blocking on status verify resize%n%s%n", currentDetails);
          Thread.sleep(5 * 1000);
       }
@@ -361,7 +367,7 @@ public class CloudServersClientLiveTest {
    private void blockUntilImageActive(int imageId) throws InterruptedException {
       Image currentDetails = null;
       for (currentDetails = client.getImage(imageId); currentDetails.getStatus() != ImageStatus.ACTIVE; currentDetails = client
-               .getImage(imageId)) {
+            .getImage(imageId)) {
          System.out.printf("blocking on status active%n%s%n", currentDetails);
          Thread.sleep(5 * 1000);
       }
@@ -459,9 +465,12 @@ public class CloudServersClientLiveTest {
       while (server == null) {
          String serverName = serverPrefix + "createserver" + new SecureRandom().nextInt();
          try {
-            server = client
-                     .createServer(serverName, imageId, flavorId, withFile("/etc/jclouds.txt", "rackspace".getBytes())
-                              .withMetadata(metadata).withSharedIpGroup(sharedIpGroupId).withSharedIp(ip));
+            server = client.createServer(
+                  serverName,
+                  imageId,
+                  flavorId,
+                  withFile("/etc/jclouds.txt", "rackspace".getBytes()).withMetadata(metadata)
+                        .withSharedIpGroup(sharedIpGroupId).withSharedIp(ip));
          } catch (UndeclaredThrowableException e) {
             HttpResponseException htpe = (HttpResponseException) e.getCause().getCause();
             if (htpe.getResponse().getStatusCode() == 400)
@@ -482,7 +491,7 @@ public class CloudServersClientLiveTest {
       try {
          ExecResponse response = exec(server, password, "ifconfig -a");
          assert response.getOutput().indexOf(ip) > 0 : String.format("server %s didn't get ip %s%n%s", server, ip,
-                  response);
+               response);
       } catch (Exception e) {
          e.printStackTrace();
       } catch (AssertionError e) {
@@ -503,7 +512,7 @@ public class CloudServersClientLiveTest {
       try {
          ExecResponse response = exec(server, password, "ifconfig -a");
          assert response.getOutput().indexOf(ip) == -1 : String.format("server %s still has get ip %s%n%s", server, ip,
-                  response);
+               response);
       } catch (Exception e) {
          e.printStackTrace();
       } catch (AssertionError e) {
@@ -592,7 +601,7 @@ public class CloudServersClientLiveTest {
    }
 
    @Test(enabled = false, timeOut = 10 * 60 * 1000, dependsOnMethods = { "testRebootSoft", "testRevertResize",
-            "testConfirmResize" })
+         "testConfirmResize" })
    void deleteServer2() {
       if (serverId2 > 0) {
          client.deleteServer(serverId2);

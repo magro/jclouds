@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,11 +16,9 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.gae;
 
 import static org.jclouds.concurrent.FutureIterables.awaitCompletion;
-import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,10 +63,10 @@ import com.google.inject.Module;
  * 
  * @author Adrian Cole
  */
-@Test(threadPoolSize = 10, groups = "integration", sequential = true)
 public class AsyncGaeHttpCommandExecutorServiceIntegrationTest extends BaseHttpCommandExecutorServiceIntegrationTest {
    Logger logger = Logger.CONSOLE;
 
+   @Override
    protected void setupAndStartSSLServer(final int testPort) throws Exception {
    }
 
@@ -192,19 +190,10 @@ public class AsyncGaeHttpCommandExecutorServiceIntegrationTest extends BaseHttpC
    }
 
    @Override
-   @Test(enabled = true, invocationCount = 5, timeOut = 3000)
+   @Test(enabled = false)
    public void testPostAsInputStream() throws MalformedURLException, ExecutionException, InterruptedException,
          TimeoutException {
-      setupApiProxy();
-      super.testPostAsInputStream();
-   }
-
-   @Override
-   @Test(enabled = true, dependsOnMethods = "testPostAsInputStream")
-   public void testPostResults() {
-      // GAE converts everything to byte arrays and so failures are not gonna
-      // happen
-      assertEquals(postFailures.get(), 0);
+      // streams aren't supported
    }
 
    @Override
@@ -277,10 +266,8 @@ public class AsyncGaeHttpCommandExecutorServiceIntegrationTest extends BaseHttpC
    }
 
    @Override
-   @Test(enabled = true, invocationCount = 5, timeOut = 3000)
-   public void testPost() throws MalformedURLException, ExecutionException, InterruptedException, TimeoutException {
-      setupApiProxy();
-      super.testPost();
+   @Test(enabled = false)
+   public void testPost() {
    }
 
    @Override
@@ -292,8 +279,7 @@ public class AsyncGaeHttpCommandExecutorServiceIntegrationTest extends BaseHttpC
 
    @Override
    @Test(enabled = true, invocationCount = 5, timeOut = 3000)
-   public void testGetStringViaRequest() throws ExecutionException, InterruptedException,
-         TimeoutException, IOException {
+   public void testGetStringViaRequest() throws ExecutionException, InterruptedException, TimeoutException, IOException {
       setupApiProxy();
       super.testGetStringViaRequest();
    }
@@ -366,6 +352,7 @@ public class AsyncGaeHttpCommandExecutorServiceIntegrationTest extends BaseHttpC
    }
 
    @Override
+   @Test(enabled = false)
    public void testPostContentDisposition() throws ExecutionException, InterruptedException, TimeoutException,
          IOException {
       setupApiProxy();
@@ -373,12 +360,14 @@ public class AsyncGaeHttpCommandExecutorServiceIntegrationTest extends BaseHttpC
    }
 
    @Override
+   @Test(enabled = true, invocationCount = 5, timeOut = 3000)
    public void testPostContentEncoding() throws ExecutionException, InterruptedException, TimeoutException, IOException {
       setupApiProxy();
       super.testPostContentEncoding();
    }
 
    @Override
+   @Test(enabled = true, invocationCount = 5, timeOut = 3000)
    public void testPostContentLanguage() throws ExecutionException, InterruptedException, TimeoutException, IOException {
       setupApiProxy();
       super.testPostContentLanguage();

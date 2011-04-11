@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.ec2.compute.internal;
 
 import static org.easymock.EasyMock.expect;
@@ -118,7 +117,7 @@ public class EC2TemplateBuilderImplTest extends TemplateBuilderImplTest {
       expect(os.getVersion()).andReturn(null).atLeastOnce();
       expect(os.getFamily()).andReturn(null).atLeastOnce();
       expect(os.getDescription()).andReturn(null).atLeastOnce();
-      expect(os.getArch()).andReturn(null).atLeastOnce();
+      expect(os.getArch()).andReturn("paravirtual").atLeastOnce();
       expect(os.is64Bit()).andReturn(false).atLeastOnce();
 
       replay(knownImage);

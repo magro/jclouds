@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.ec2.compute.functions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,7 +33,7 @@ import javax.inject.Singleton;
 import org.jclouds.collect.Memoized;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.ImageBuilder;
-import org.jclouds.compute.domain.OperatingSystemBuilder;
+import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.compute.strategy.PopulateDefaultLoginCredentialsForImageStrategy;
@@ -91,14 +90,14 @@ public class EC2ImageParser implements Function<org.jclouds.ec2.domain.Image, Im
       builder.userMetadata(ImmutableMap.<String, String> of("owner", from.getImageOwnerId(), "rootDeviceType", from
                .getRootDeviceType().toString()));
 
-      OperatingSystemBuilder osBuilder = new OperatingSystemBuilder();
+      OperatingSystem.Builder osBuilder = OperatingSystem.builder();
       osBuilder.is64Bit(from.getArchitecture() == Architecture.X86_64);
       OsFamily family = parseOsFamilyOrUnrecognized(from.getImageLocation());
       osBuilder.family(family);
       osBuilder.version(ComputeServiceUtils.parseVersionOrReturnEmptyString(family, from.getImageLocation(),
                osVersionMap));
       osBuilder.description(from.getImageLocation());
-      osBuilder.arch(from.getVirtualizationType());
+      osBuilder.arch(from.getVirtualizationType().value());
 
       reviseParsedImage.reviseParsedImage(from, builder, family, osBuilder);
 

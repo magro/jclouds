@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,13 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.http.apachehc;
 
+import static org.jclouds.Constants.PROPERTY_CONNECTION_TIMEOUT;
 import static org.jclouds.Constants.PROPERTY_IO_WORKER_THREADS;
-import static org.jclouds.Constants.*;
+import static org.jclouds.Constants.PROPERTY_MAX_CONNECTIONS_PER_CONTEXT;
 import static org.jclouds.Constants.PROPERTY_MAX_CONNECTIONS_PER_HOST;
+import static org.jclouds.Constants.PROPERTY_SO_TIMEOUT;
 import static org.jclouds.Constants.PROPERTY_USER_THREADS;
 
 import java.io.IOException;
@@ -40,10 +41,10 @@ import com.google.inject.Module;
  * 
  * @author Adrian Cole
  */
-@Test
-public class ApacheHCHttpCommandExecutorServiceTest extends BaseHttpCommandExecutorServiceIntegrationTest {
+public class ApacheHCHttpCommandExecutorServiceTestDisabled extends BaseHttpCommandExecutorServiceIntegrationTest {
+
    static {
-      System.setProperty("http.conn-manager.timeout", 1000 + "");
+      System.setProperty("http.conn-manager.timeout", 5000 + "");
    }
 
    protected Module createConnectionModule() {
@@ -60,6 +61,7 @@ public class ApacheHCHttpCommandExecutorServiceTest extends BaseHttpCommandExecu
    }
 
    @Override
+   @Test(enabled = false)
    public void testPostContentDisposition() throws ExecutionException, InterruptedException, TimeoutException,
          IOException {
       // TODO: currently times out, see issue
@@ -67,12 +69,14 @@ public class ApacheHCHttpCommandExecutorServiceTest extends BaseHttpCommandExecu
    }
 
    @Override
+   @Test(enabled = false)
    public void testPostContentEncoding() throws ExecutionException, InterruptedException, TimeoutException, IOException {
       // TODO: currently times out, see issue
       // http://code.google.com/p/jclouds/issues/detail?id=353
    }
 
    @Override
+   @Test(enabled = false)
    public void testPostContentLanguage() throws ExecutionException, InterruptedException, TimeoutException, IOException {
       // TODO: currently times out, see issue
       // http://code.google.com/p/jclouds/issues/detail?id=353

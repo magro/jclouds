@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.aws.s3.blobstore.integration;
 
 import java.io.IOException;
@@ -25,8 +24,8 @@ import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.BlobStoreContextFactory;
 import org.jclouds.blobstore.integration.TransientBlobStoreTestInitializer;
 import org.jclouds.blobstore.integration.internal.BaseBlobStoreIntegrationTest;
+import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
-import org.jclouds.netty.config.NettyPayloadModule;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
@@ -46,7 +45,8 @@ public class AWSS3TestInitializer extends TransientBlobStoreTestInitializer {
    protected BlobStoreContext createLiveContext(Module configurationModule, String endpoint, String apiversion,
             String app, String identity, String credential) throws IOException {
       return new BlobStoreContextFactory().createContext(provider, ImmutableSet.of(configurationModule,
-               new Log4JLoggingModule(), new NettyPayloadModule()), setupProperties(endpoint, apiversion, identity, credential));
+               new Log4JLoggingModule(), new EnterpriseConfigurationModule()), setupProperties(endpoint, apiversion,
+               identity, credential));
    }
 
 }

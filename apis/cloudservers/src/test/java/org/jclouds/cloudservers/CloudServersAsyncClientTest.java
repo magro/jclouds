@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.cloudservers;
 
 import static org.jclouds.Constants.PROPERTY_API_VERSION;
@@ -195,6 +194,21 @@ public class CloudServersAsyncClientTest extends RestClientTest<CloudServersAsyn
       assertResponseParserClassEquals(method, request, ReturnTrueIf2xx.class);
       assertSaxResponseParserClassEquals(method, null);
       assertExceptionParserClassEquals(method, ReturnFalseOnNotFoundOr404.class);
+
+      checkFilters(request);
+   }
+
+   public void testLimits() throws IOException, SecurityException, NoSuchMethodException {
+      Method method = CloudServersAsyncClient.class.getMethod("getLimits");
+      HttpRequest request = processor.createRequest(method);
+
+      assertRequestLineEquals(request, "GET http://serverManagementUrl/limits?format=json HTTP/1.1");
+      assertNonPayloadHeadersEqual(request, "Accept: application/json\n");
+      assertPayloadEquals(request, null, null, false);
+
+      assertResponseParserClassEquals(method, request, UnwrapOnlyJsonValue.class);
+      assertSaxResponseParserClassEquals(method, null);
+      assertExceptionParserClassEquals(method, ReturnEmptySetOnNotFoundOr404.class);
 
       checkFilters(request);
    }

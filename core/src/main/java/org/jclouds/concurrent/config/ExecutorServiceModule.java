@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.concurrent.config;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -178,7 +177,7 @@ public class ExecutorServiceModule extends AbstractModule {
          return new AddToStringFuture<T>(delegate.submit(task), task.toString());
       }
 
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({ "unchecked", "rawtypes" })
       @Override
       public Future<?> submit(Runnable task) {
          return new AddToStringFuture(delegate.submit(task), task.toString());

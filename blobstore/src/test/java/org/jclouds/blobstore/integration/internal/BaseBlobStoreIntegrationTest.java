@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.blobstore.integration.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -26,8 +25,8 @@ import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
@@ -54,6 +53,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.inject.Module;
@@ -64,19 +64,20 @@ public class BaseBlobStoreIntegrationTest {
    protected static final String TEST_STRING = String.format(XML_STRING_FORMAT, "apple");
 
    protected Map<String, String> fiveStrings = ImmutableMap.of("one", String.format(XML_STRING_FORMAT, "apple"), "two",
-            String.format(XML_STRING_FORMAT, "bear"), "three", String.format(XML_STRING_FORMAT, "candy"), "four",
-            String.format(XML_STRING_FORMAT, "dogma"), "five", String.format(XML_STRING_FORMAT, "emma"));
+         String.format(XML_STRING_FORMAT, "bear"), "three", String.format(XML_STRING_FORMAT, "candy"), "four",
+         String.format(XML_STRING_FORMAT, "dogma"), "five", String.format(XML_STRING_FORMAT, "emma"));
 
-   protected Map<String, String> fiveStringsUnderPath = ImmutableMap.of("path/1", String.format(XML_STRING_FORMAT,
-            "apple"), "path/2", String.format(XML_STRING_FORMAT, "bear"), "path/3", String.format(XML_STRING_FORMAT,
-            "candy"), "path/4", String.format(XML_STRING_FORMAT, "dogma"), "path/5", String.format(XML_STRING_FORMAT,
-            "emma"));
+   protected Map<String, String> fiveStringsUnderPath = ImmutableMap.of("path/1",
+         String.format(XML_STRING_FORMAT, "apple"), "path/2", String.format(XML_STRING_FORMAT, "bear"), "path/3",
+         String.format(XML_STRING_FORMAT, "candy"), "path/4", String.format(XML_STRING_FORMAT, "dogma"), "path/5",
+         String.format(XML_STRING_FORMAT, "emma"));
 
    public static long INCONSISTENCY_WINDOW = 10000;
    protected static volatile AtomicInteger containerIndex = new AtomicInteger(0);
 
    protected volatile BlobStoreContext context;
-   protected static volatile int containerCount = 10;
+   protected static volatile int containerCount = Integer.parseInt(System.getProperty("test.blobstore.container-count",
+         "10"));
    public static final String CONTAINER_PREFIX = System.getProperty("user.name") + "-blobstore";
    /**
     * two test groups integration and live.
@@ -94,7 +95,7 @@ public class BaseBlobStoreIntegrationTest {
 
    @SuppressWarnings("unchecked")
    private BlobStoreContext getCloudResources(ITestContext testContext) throws ClassNotFoundException,
-            InstantiationException, IllegalAccessException, Exception {
+         InstantiationException, IllegalAccessException, Exception {
       String initializerClass = checkNotNull(System.getProperty("test.initializer"), "test.initializer");
       Class<BaseTestInitializer> clazz = (Class<BaseTestInitializer>) Class.forName(initializerClass);
       BaseTestInitializer initializer = clazz.newInstance();
@@ -127,7 +128,7 @@ public class BaseBlobStoreIntegrationTest {
    private static volatile boolean initialized = false;
 
    protected void createContainersSharedByAllThreads(BlobStoreContext context, ITestContext testContext)
-            throws Exception {
+         throws Exception {
       while (!initialized) {
          synchronized (BaseBlobStoreIntegrationTest.class) {
             if (!initialized) {
@@ -178,12 +179,12 @@ public class BaseBlobStoreIntegrationTest {
       try {
          for (int i = 0; i < 2; i++) {
             Iterable<? extends StorageMetadata> testContainers = Iterables.filter(context.getBlobStore().list(),
-                     new Predicate<StorageMetadata>() {
-                        public boolean apply(StorageMetadata input) {
-                           return (input.getType() == StorageType.CONTAINER || input.getType() == StorageType.FOLDER)
-                                    && input.getName().startsWith(CONTAINER_PREFIX.toLowerCase());
-                        }
-                     });
+                  new Predicate<StorageMetadata>() {
+                     public boolean apply(StorageMetadata input) {
+                        return (input.getType() == StorageType.CONTAINER || input.getType() == StorageType.FOLDER)
+                              && input.getName().startsWith(CONTAINER_PREFIX.toLowerCase());
+                     }
+                  });
             for (StorageMetadata container : testContainers) {
                deleteContainerOrWarnIfUnable(context, container.getName());
             }
@@ -204,7 +205,7 @@ public class BaseBlobStoreIntegrationTest {
     * we will try up to the inconsistency window to see if the assertion completes.
     */
    protected static void assertConsistencyAware(BlobStoreContext context, Runnable assertion)
-            throws InterruptedException {
+         throws InterruptedException {
       if (context.getConsistencyModel() == ConsistencyModel.STRICT) {
          assertion.run();
          return;
@@ -230,7 +231,7 @@ public class BaseBlobStoreIntegrationTest {
    }
 
    protected static void createContainerAndEnsureEmpty(BlobStoreContext context, final String containerName)
-            throws InterruptedException {
+         throws InterruptedException {
       context.getBlobStore().createContainerInLocation(null, containerName);
       if (context.getConsistencyModel() == ConsistencyModel.EVENTUAL)
          Thread.sleep(1000);
@@ -252,8 +253,8 @@ public class BaseBlobStoreIntegrationTest {
 
    protected void add5BlobsUnderPathAnd5UnderRootToContainer(String sourceContainer) {
       for (Entry<String, String> entry : Iterables.concat(fiveStrings.entrySet(), fiveStringsUnderPath.entrySet())) {
-         Blob sourceObject = context.getBlobStore().blobBuilder(entry.getKey()).payload(entry.getValue()).contentType(
-                  "text/xml").build();
+         Blob sourceObject = context.getBlobStore().blobBuilder(entry.getKey()).payload(entry.getValue())
+               .contentType("text/xml").build();
          addBlobToContainer(sourceContainer, sourceObject);
       }
    }
@@ -283,19 +284,55 @@ public class BaseBlobStoreIntegrationTest {
    }
 
    protected void assertConsistencyAwareContainerSize(final String containerName, final int count)
-            throws InterruptedException {
+         throws InterruptedException {
       assertConsistencyAware(new Runnable() {
          public void run() {
             try {
                assert context.getBlobStore().countBlobs(containerName) == count : String.format(
-                        "expected only %d values in %s: %s", count, containerName, Sets.newHashSet(Iterables.transform(
-                                 context.getBlobStore().list(containerName), new Function<StorageMetadata, String>() {
+                     "expected only %d values in %s: %s", count, containerName, ImmutableSet.copyOf(Iterables
+                           .transform(context.getBlobStore().list(containerName),
+                                 new Function<StorageMetadata, String>() {
 
                                     public String apply(StorageMetadata from) {
                                        return from.getName();
                                     }
 
                                  })));
+            } catch (Exception e) {
+               Throwables.propagateIfPossible(e);
+            }
+         }
+      });
+   }
+
+   protected void assertConsistencyAwareBlobExists(final String containerName, final String name)
+         throws InterruptedException {
+      assertConsistencyAware(new Runnable() {
+         public void run() {
+            try {
+               assert context.getBlobStore().blobExists(containerName, name) : String.format(
+                     "could not find %s in %s: %s", name, containerName, ImmutableSet.copyOf(Iterables.transform(
+                           context.getBlobStore().list(containerName), new Function<StorageMetadata, String>() {
+
+                              public String apply(StorageMetadata from) {
+                                 return from.getName();
+                              }
+
+                           })));
+            } catch (Exception e) {
+               Throwables.propagateIfPossible(e);
+            }
+         }
+      });
+   }
+
+   protected void assertConsistencyAwareBlobDoesntExist(final String containerName, final String name)
+         throws InterruptedException {
+      assertConsistencyAware(new Runnable() {
+         public void run() {
+            try {
+               assert !context.getBlobStore().blobExists(containerName, name) : String.format("found %s in %s", name,
+                     containerName);
             } catch (Exception e) {
                Throwables.propagateIfPossible(e);
             }
@@ -349,7 +386,7 @@ public class BaseBlobStoreIntegrationTest {
          public void run() {
             try {
                assert !context.getBlobStore().containerExists(containerName) : "container " + containerName
-                        + " still exists";
+                     + " still exists";
             } catch (Exception e) {
                propagateIfPossible(e);
             }

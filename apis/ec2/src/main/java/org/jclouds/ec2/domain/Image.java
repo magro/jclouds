@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.ec2.domain;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -61,9 +60,9 @@ public class Image implements Comparable<Image> {
    @Nullable
    private final String rootDeviceName;
    private final Map<String, EbsBlockDevice> ebsBlockDevices = Maps.newHashMap();
-   private final String virtualizationType;
+   private final VirtualizationType virtualizationType;
 
-   public String getVirtualizationType() {
+   public VirtualizationType getVirtualizationType() {
       return virtualizationType;
    }
 
@@ -71,7 +70,7 @@ public class Image implements Comparable<Image> {
             String imageId, String imageLocation, String imageOwnerId, ImageState imageState, ImageType imageType,
             boolean isPublic, Iterable<String> productCodes, @Nullable String kernelId, @Nullable String platform,
             @Nullable String ramdiskId, RootDeviceType rootDeviceType, @Nullable String rootDeviceName,
-            Map<String, EbsBlockDevice> ebsBlockDevices, String virtualizationType) {
+            Map<String, EbsBlockDevice> ebsBlockDevices, VirtualizationType virtualizationType) {
       this.region = checkNotNull(region, "region");
       this.architecture = checkNotNull(architecture, "architecture");
       this.imageId = checkNotNull(imageId, "imageId");

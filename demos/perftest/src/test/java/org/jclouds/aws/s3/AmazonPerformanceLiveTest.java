@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2010 Cloud Conscious, LLC. <info@cloudconscious.com>
+ * Copyright (C) 2011 Cloud Conscious, LLC. <info@cloudconscious.com>
  *
  * ====================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
  * limitations under the License.
  * ====================================================================
  */
-
 package org.jclouds.aws.s3;
 
 import java.io.ByteArrayInputStream;
@@ -50,8 +49,8 @@ public class AmazonPerformanceLiveTest extends BasePerformanceLiveTest {
    public void setUpResourcesOnThisThread(ITestContext testContext) throws Exception {
       super.setUpResourcesOnThisThread(testContext);
       exec = Executors.newCachedThreadPool();
-      s3 = new AmazonS3Client(new BasicAWSCredentials(System.getProperty("test.s3.identity"),
-            System.getProperty("test.s3.credential")));
+      s3 = new AmazonS3Client(new BasicAWSCredentials(System.getProperty("test.aws-s3.identity"),
+            System.getProperty("test.aws-s3.credential")));
    }
 
    @Override
