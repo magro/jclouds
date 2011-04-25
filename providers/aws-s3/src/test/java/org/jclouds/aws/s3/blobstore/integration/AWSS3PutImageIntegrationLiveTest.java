@@ -95,7 +95,7 @@ public class AWSS3PutImageIntegrationLiveTest {
         s3BlobStoreContext.close();
     }
 
-    @Test(groups = { "integration", "live" }, invocationCount = 100, threadPoolSize = 20 )
+    @Test(groups = { "integration", "live" }, invocationCount = 1, threadPoolSize = 1 )
     public void testPutImage() throws InterruptedException, IOException {
         
         File testImg = new File( getClass().getResource( "/testimg.png" ).getFile() );
